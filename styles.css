@@ -1,0 +1,9 @@
+.title-slide hgroup > h1 {
+  font-size: 30pt;
+  letter-spacing: 0;
+}
+
+.title-slide hgroup > h2 {
+  font-size: 20pt;
+  letter-spacing: 0;
+}

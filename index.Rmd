@@ -1,0 +1,154 @@
+---
+title: "Claim Cost Reserving"
+subtitle: "How much money to set aside for insurance claims?"
+author: "Kelvin Chan"
+date: "October, 2016"
+output: ioslides_presentation
+css: styles.css
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Introduction
+
+Adequate reserving for potential claims is a critical function for insurance companies.
+In order to determine the reserve or capital requirement for claims, the following key inputs need to be ascertained:
+
+1. The frequency of claims (how often do they occur in a year?)
+2. The mean severity of claims (on average if a claim occurs what is the dollar impact?)
+3. The variability of claim severity (if a claim occurs, how variable is the claim size?)
+4. A capital adequacy level (level of capital needed to withstand X% of scenarios in a year)
+
+## Scenario Simulator
+
+A simplified application has been constructed to allow users to understand the impact of how changing portfolio risk (frequency and severity of claims) affects the capital requirement. The application is located at this [website](https://khychan.shinyapps.io/ReservingApp/). 
+
+In practice, industry data would be used to fit the claim count and claim cost distributions. This application assumes the following:
+
+- A Poisson distribution is used to model claim counts
+- A Lognormal distribution is used to model the cost when claims occur
+
+## Frequency of Claims
+
+More frequent claims result in a higher claim count average and variability.
+
+``` {r, echo=FALSE}
+library(ggplot2)
+# Setup user interface inputs and outputs
+sidebarLayout(
+                sidebarPanel(
+                        sliderInput("claims.per.annum",
+                                        "Claims each year:",
+                                        min = 500,
+                                        max = 2000,
+                                        value = 1000,
+                                        step = 250)
+                ),
+                mainPanel(
+                        plotOutput("graph1")
+                )
+)
+
+# Calculate total claim counts
+        claims <- reactive({
+        set.seed(123)
+        simulations <- 10000
+        claims.per.annum <- input$claims.per.annum
+
+        sapply(1:10000, function(x) rpois(1,claims.per.annum))
+        })
+
+# Output distribution of claim counts with mean line        
+        output$graph1 <- renderPlot({
+                qplot(claims(),geom="histogram", bins = 50, main ="Histogram of Claim Counts in a Year", 
+                      xlab= "Total Claim Counts in a Year", ylab= "Frequency", fill=I("lightgreen"))+
+                        geom_vline(xintercept = mean(claims()),lwd=1)
+        })
+```
+
+## Capital Adequacy
+
+Capital needed rises with claim cost and adequacy level.
+
+``` {r, echo=FALSE}
+library(ggplot2)
+# Setup user interface inputs and outputs
+sidebarLayout(
+                sidebarPanel(
+                        sliderInput("claims.per.annum2",
+                                        "Claims each year:",
+                                        min = 500,
+                                        max = 2000,
+                                        value = 1000,
+                                        step = 250),
+                        sliderInput("mean.input",
+                                        "Mean ($):",
+                                        min = 500,
+                                        max = 10000,
+                                        value = 5000,
+                                        step = 500),
+                        sliderInput("stdev.input",
+                                        "Standard deviation ($):",
+                                        min = 500,
+                                        max = 10000,
+                                        value = 5000,
+                                        step = 500),
+                        selectInput("threshold","Adequacy Level:",choices = c("95.0%","99.0%","99.5%"))
+                ),
+                mainPanel(
+                        plotOutput("graph2"),
+                        verbatimTextOutput("capitalRequirement")
+                )
+)
+
+# Calculate total claim counts
+        claims2 <- reactive({
+        set.seed(123)
+        simulations <- 10000
+        claims.per.annum <- input$claims.per.annum2
+        mean.input <- input$mean.input
+        stdev.input <- input$stdev.input
+        
+        sigma <- sqrt(log(stdev.input^2/mean.input^2+1))
+        mu <- log(mean.input)-0.5*sigma^2        
+
+        sapply(1:10000, function(x) rpois(1,input$claims.per.annum2))
+        })
+
+# Calculate total claim cost amounts
+        claimsCost <- reactive({
+        set.seed(123)
+        sigma <- sqrt(log(input$stdev.input^2/input$mean.input^2+1))
+        mu <- log(input$mean.input)-0.5*sigma^2        
+
+        sapply(1:10000, function(x) sum(rlnorm(rpois(1,input$claims.per.annum2),mu,sigma))/10^6)
+        })
+
+        threshold <- reactive({
+                switch(input$threshold,
+                            "95.0%" = 0.95,
+                            "99.0%" = 0.99,
+                            "99.5%" = 0.995
+        )
+        })
+
+# Output graph of aggregate claim costs and capital adequacy threshold line
+        output$graph2 <- renderPlot({
+                qplot(claimsCost(),geom="histogram", bins = 50, main ="Histogram of Claim Costs in a Year", 
+                      xlab= "Total Claims Cost in a Year ($m)", ylab= "Frequency", fill=I("lightblue"))+
+                        geom_vline(xintercept=mean(claimsCost()),lwd=1)+
+                        geom_vline(xintercept = quantile(claimsCost(),threshold()),lwd=1,col='red')
+        })
+        
+# Capital requirement based on chosen threshold        
+        output$capitalRequirement <- renderText({
+                paste("Capital Requirement is: $", paste(as.character(format(quantile(claimsCost(),threshold()),
+                                                                             digits=2,nsmall=2))), "m")
+        })
+```
+
+
+

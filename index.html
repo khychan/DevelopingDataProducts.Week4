@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Introduction</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Introduction</h2>
+
+<p>Adequate reserving for potential claims is a critical function for insurance companies.
+In order to determine the reserve or capital requirement for claims, the following key inputs need to be ascertained:</p>
+
+<ol>
+<li>The frequency of claims (how often do they occur in a year?)</li>
+<li>The mean severity of claims (on average if a claim occurs what is the dollar impact?)</li>
+<li>The variability of claim severity (if a claim occurs, how variable is the claim size?)</li>
+<li>A capital adequacy level (level of capital needed to withstand X% of scenarios in a year)</li>
+</ol>
+
+<h2>Scenario Simulator</h2>
+
+<p>A simplified application has been constructed to allow users to understand the impact of how changing portfolio risk (frequency and severity of claims) affects the capital requirement. The application is located at this <a href="https://khychan.shinyapps.io/ReservingApp/">website</a>. </p>
+
+<p>In practice, industry data would be used to fit the claim count and claim cost distributions. This application assumes the following:</p>
+
+<ul>
+<li>A Poisson distribution is used to model claim counts</li>
+<li>A Lognormal distribution is used to model the cost when claims occur</li>
+</ul>
+
+<h2>Frequency of Claims</h2>
+
+<p>More frequent claims result in a higher claim count average and variability.</p>
+
+<p>&lt;!&ndash;html_preserve&ndash;&gt;<div class="row"></p>
+
+<div class="col-sm-4">
+<form class="well">
+<div class="form-group shiny-input-container">
+<label class="control-label" for="claims.per.annum">Claims each year:</label>
+<input class="js-range-slider" id="claims.per.annum" data-min="500" data-max="2000" data-from="1000" data-step="250" data-grid="true" data-grid-num="6" data-grid-snap="false" data-keyboard="true" data-keyboard-step="16.6666666666667" data-drag-interval="true" data-data-type="number" data-prettify-separator=","/>
+</div>
+
+<p></form>
+</div></p>
+
+<div class="col-sm-8">
+<div id="graph1" class="shiny-plot-output" style="width: 100% ; height: 400px"></div>
+</div>
+
+<p></div>&lt;!&ndash;/html_preserve&ndash;&gt;</p>
+
+<pre><code>## Error in output$graph1 &lt;- renderPlot({: object &#39;output&#39; not found
+</code></pre>
+
+<h2>Capital Adequacy</h2>
+
+<p>Capital needed rises with claim cost and adequacy level.</p>
+
+<p>&lt;!&ndash;html_preserve&ndash;&gt;<div class="row"></p>
+
+<div class="col-sm-4">
+<form class="well">
+<div class="form-group shiny-input-container">
+<label class="control-label" for="claims.per.annum2">Claims each year:</label>
+<input class="js-range-slider" id="claims.per.annum2" data-min="500" data-max="2000" data-from="1000" data-step="250" data-grid="true" data-grid-num="6" data-grid-snap="false" data-keyboard="true" data-keyboard-step="16.6666666666667" data-drag-interval="true" data-data-type="number" data-prettify-separator=","/>
+</div>
+
+<div class="form-group shiny-input-container">
+<label class="control-label" for="mean.input">Mean ($):</label>
+<input class="js-range-slider" id="mean.input" data-min="500" data-max="10000" data-from="5000" data-step="500" data-grid="true" data-grid-num="9.5" data-grid-snap="false" data-keyboard="true" data-keyboard-step="5.26315789473684" data-drag-interval="true" data-data-type="number" data-prettify-separator=","/>
+</div>
+
+<div class="form-group shiny-input-container">
+<label class="control-label" for="stdev.input">Standard deviation ($):</label>
+<input class="js-range-slider" id="stdev.input" data-min="500" data-max="10000" data-from="5000" data-step="500" data-grid="true" data-grid-num="9.5" data-grid-snap="false" data-keyboard="true" data-keyboard-step="5.26315789473684" data-drag-interval="true" data-data-type="number" data-prettify-separator=","/>
+</div>
+
+<div class="form-group shiny-input-container">
+<label class="control-label" for="threshold">Adequacy Level:</label>
+<div>
+<select id="threshold"><option value="95.0%" selected>95.0%</option>
+<option value="99.0%">99.0%</option>
+<option value="99.5%">99.5%</option></select>
+<script type="application/json" data-for="threshold" data-nonempty="">{}</script>
+</div>
+
+<p></div>
+</form>
+</div></p>
+
+<div class="col-sm-8">
+<div id="graph2" class="shiny-plot-output" style="width: 100% ; height: 400px"></div>
+<pre id="capitalRequirement" class="shiny-text-output"></pre>
+</div>
+
+<p></div>&lt;!&ndash;/html_preserve&ndash;&gt;</p>
+
+<pre><code>## Error in output$graph2 &lt;- renderPlot({: object &#39;output&#39; not found
+</code></pre>
+
+<pre><code>## Error in output$capitalRequirement &lt;- renderText({: object &#39;output&#39; not found
+</code></pre>
+
+</body>
+
+</html>
