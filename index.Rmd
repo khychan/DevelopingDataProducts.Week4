@@ -35,10 +35,13 @@ In practice, industry data would be used to fit the claim count and claim cost d
 
 More frequent claims result in a higher claim count average and variability.
 
-``` {r, echo=FALSE}
+``` {r, echo=FALSE, results='asis', message= FALSE, warning=FALSE}
+library(shiny)
 library(ggplot2)
 # Setup user interface inputs and outputs
-sidebarLayout(
+shinyApp(
+ui = fluidPage(
+        sidebarLayout(
                 sidebarPanel(
                         sliderInput("claims.per.annum",
                                         "Claims each year:",
@@ -50,9 +53,10 @@ sidebarLayout(
                 mainPanel(
                         plotOutput("graph1")
                 )
-)
+)),
 
 # Calculate total claim counts
+server = function(input,output) {
         claims <- reactive({
         set.seed(123)
         simulations <- 10000
@@ -67,16 +71,21 @@ sidebarLayout(
                       xlab= "Total Claim Counts in a Year", ylab= "Frequency", fill=I("lightgreen"))+
                         geom_vline(xintercept = mean(claims()),lwd=1)
         })
+}
+)
 ```
 
 ## Capital Adequacy
 
 Capital needed rises with claim cost and adequacy level.
 
-``` {r, echo=FALSE}
+``` {r, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+library(shiny)
 library(ggplot2)
 # Setup user interface inputs and outputs
-sidebarLayout(
+shinyApp(
+ui = fluidPage(
+        sidebarLayout(
                 sidebarPanel(
                         sliderInput("claims.per.annum2",
                                         "Claims each year:",
@@ -102,9 +111,10 @@ sidebarLayout(
                         plotOutput("graph2"),
                         verbatimTextOutput("capitalRequirement")
                 )
-)
+)),
 
 # Calculate total claim counts
+server = function(input,output){
         claims2 <- reactive({
         set.seed(123)
         simulations <- 10000
@@ -148,6 +158,7 @@ sidebarLayout(
                 paste("Capital Requirement is: $", paste(as.character(format(quantile(claimsCost(),threshold()),
                                                                              digits=2,nsmall=2))), "m")
         })
+})
 ```
 
 
